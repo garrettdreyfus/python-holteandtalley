@@ -80,10 +80,10 @@ class tempProfile:
 
     #The density gradient threshold or max if threshold not met
     def calculateDTM(self):
-        out = np.argwhere(np.array(self.temperatureGradients) > 0.005)
+        out = np.argwhere(np.absolute(np.array(self.temperatureGradients)) > 0.005)
         if len(out) > 0:
             return out[0]
-        return np.argmax(self.temperatureGradients)
+        return np.argmax(np.absolute(self.temperatureGradients))
 
     #The minimum of the depth of the temperature gradiet maximum and the temperature maximum
     def calculateTDTM(self):
