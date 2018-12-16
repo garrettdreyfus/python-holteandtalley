@@ -14,7 +14,7 @@ The paper outlining this algorithm is [here](http://http://mixedlayer.ucsd.edu/d
 
 ##MLTFit
 
-The MLTFit is defined as the interection of the line of best fit of the thermocline and the mixed layer. The best fit line of the thermocline is the line tangent to the profile at the point where d(T)/d(P) is the greatest. To determine the best fit line of the mixed layer, the algorithm calculates the best fit over progressively more points in the profile, calculates the error over the points included in the fit and then finds the deepest fit line which satisfies an error tolerance E<sub>T</sub> < 10<sup>-10</sup>. 
+The MLTFit is defined as the interection of the line of best fit of the thermocline and the mixed layer. The best fit line of the thermocline is the line tangent to the profile at the point where d(T)/d(P) is the greatest. To determine the best fit line of the mixed layer, the algorithm calculates the best fit over progressively more points in the profile, calculates the error over the points included in the fit and then finds the deepest fit line which satisfies an error tolerance E<sub>T</sub> < 10<sup>-10</sup>.
 
 ##TTMLD
 
@@ -35,3 +35,10 @@ The minimum of the gradient maximum and the temperature maximum if that is less 
 ##DTM
 
 Deepest point such that the gradient is less than 0.005 C/dbar or max if that criteria is not met.
+
+
+##Some results
+
+![](readmeimages/summerprofile.png)
+![](readmeimages/winterprofile.png)
+![](readmeimages/h&Texamplerun.png)

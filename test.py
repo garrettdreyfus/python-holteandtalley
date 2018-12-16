@@ -11,9 +11,9 @@ for file in os.listdir("profiles"):
         plt.figure()
         filename = os.path.join("profiles", file)
         dataset = Dataset(filename)
-        pressures = dataset.variables["pres"][:][0]
-        salts = dataset.variables["psal"][:][0]
-        temps = dataset.variables["temp"][:][0]
+        pressures = dataset.variables["PRES"][:][0]
+        salts = dataset.variables["PSAL"][:][0]
+        temps = dataset.variables["TEMP"][:][0]
         tempsOut=[]
         pressuresOut=[]
         densitiesOut=[]
@@ -28,33 +28,33 @@ for file in os.listdir("profiles"):
                 densitiesOut.append(float(gsw.sigma0(psal,temp)))
         ts = tempsOut
         ps = pressuresOut
-        try:
-            a = tempProfile(ts,ps)
-        except:
-            print(filename)
+        #try:
+        #except:
+            #print(filename)
+            #break
+        #try:
+        a = tempProfile(ts,ps)
+        #except Exception as e:
+            #print(e)
+            #print("did not converge")
+            #break
         plt.plot(ts,ps)
-        plt.ylim(max(ps),min(ps))
+        #plt.ylim(max(ps),min(ps))
+        plt.ylim(500,0)
         plt.plot(ts[a.TMax],ps[a.TMax],'bo')
-        plt.plot(ts[a.TTMLD],ps[a.TTMLD],'ro')
-        plt.plot(ts[a.MLTFIT],ps[a.MLTFIT],'go')
-        plt.plot(ts[a.dT],ps[a.dT],'bx')
-        plt.plot(ts[a.DTM],ps[a.DTM],'gx')
-        plt.plot(ts[a.TDTM],ps[a.TDTM],'rx')
+        plt.plot(ts[a.TTMLD],ps[a.TTMLD],'gs')
+        plt.plot(ts[a.MLTFIT],ps[a.MLTFIT],'o',color="orange")
+        plt.plot(ts[a.DTM],ps[a.DTM],'g>')
+        plt.plot(ts[a.TDTM],ps[a.TDTM],'bs')
         a.findTemperatureMLD()
-        y_vals = []
-        #for i in ps:
-            #y_vals.append(i*a.mltfitline[0]+a.mltfitline[1])
-        #plt.plot(y_vals,ps)
-        #y_vals = []
-        #for i in ps:
-            #y_vals.append(i*a.thermoclinefitline[0]+a.thermoclinefitline[1])
-        #plt.plot(y_vals,ps)
         #plt.ylim(500,0)
-        plt.axhline(ps[a.foundMLD])
+        plt.axhline(a.foundMLD)
+        print(a.temperatureGradients)
+                
         plt.xlabel("Temperature (C)")
         plt.ylabel("Pressures (dbar)")
-        plt.title(str("lat : "+str(dataset.variables["latitude"][0])+
-                    "lon : "+str(dataset.variables["longitude"][0])+
-                    "path :  "+a.path + "mlt index: " + str(a.foundMLD)))
-        #print(a)
+        plt.title(str("lat : "+str(dataset.variables["LATITUDE"][0])+
+                    "lon : "+str(dataset.variables["LONGITUDE"][0])+
+                    "path :  "+a.path + "  mlt: " + str(a.foundMLD)))
+        print(a)
 plt.show()
