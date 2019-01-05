@@ -175,7 +175,27 @@ class densityProfile:
 
     #Based on find_mld.m from Holte and Talley Suplementary materials
     def mldSummerProfile(self):
-        return 0
+        MLD = self.MLTFITPressure
+        if MLD > self.MLTFITPressure:
+            MLD = self.DThresholdPressure
+        ## If any two of these three conditions are true
+        conditions = [abs(self.MLDS-self.MLDT),abs(self.MLTFITPressure-self.MLDT),abs(self.MLDS - self.MLTFITPressure)]
+        s =0
+        for a in conditions:
+            if a <self.range:
+                s+=1
+        if s >1:
+            MLD = self.MLTFITPressure
+        if abs(self.MLDS - self.DThresholdPressure) < self.range and self.MLDS != self.DThresholdPressure:
+            if self.DThresholdPressure < self.MLDS:
+                MLD = self.DThresholdPressure
+            else:
+                MLD = self.MLDS
+            if self.MLTFITPressure == self.DThresholdPressure:
+                MLD = self.MLTFITPressure
+        if MLD > self.DGradientThresholdPressure and abs(self.DGradientThresholdPressure - self.MLDT):
+           MLD = self.DGradientThresholdPressure 
+        return MLD
 
     def findMLD(self):
         if self.sp.densityTest:
