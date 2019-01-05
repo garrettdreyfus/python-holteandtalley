@@ -1,6 +1,6 @@
 import numpy as np
 class tempProfile:
-    def __init__(self,temperatures=None,pressures=None):
+    def __init__(self,pressures,temperatures):
         self.mltfitline = []
         self.thermoclinefitline = []
         ##fnd reference pressure, this is done in holte and talley 
@@ -47,7 +47,6 @@ class tempProfile:
     def calculateTMax(self):
         maxIndex = 0
         for i in range(len(self.temperatures)):
-            print(self.temperatures[i])
             if self.temperatures[i] >= self.temperatures[maxIndex]:
                 maxIndex = i
         return maxIndex

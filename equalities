@@ -1,0 +1,27 @@
+This file just outlines the conversion of variables from the matlab file to the python files
+---------------------------
+Salinity Algorithm
+
+upperdsmax -> MLTFIT
+mldepthdens -> DThreshold
+dsmin -> SGradientMax
+dsanddsmin -> IntrusionDepth
+mixedt -> MLDT
+---------------------------
+Density Algorithm
+
+mixedd -> MLD
+mixeds -> MLDS
+mixedt -> MLDT
+upperddmax -> MLTFIT
+upperdsmax -> sp.MLTFIT
+mldepthdens -> DThreshold
+ddmin -> DGradientThreshold
+mldepthptmp -> tp.TTMLD
+dtandtmax -> TDTM
+tmax -> Tmax
+
+
+dsmin -> SGradientMax
+dsanddsmin -> IntrusionDepth
+mixedt -> MLDT
