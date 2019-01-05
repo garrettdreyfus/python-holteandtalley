@@ -1,14 +1,14 @@
 import numpy as np
-class tempProfile:
-    def __init__(self,temperatures=None,pressures=None):
+class densityProfile:
+    def __init__(self,densities=None,pressures=None):
         self.mltfitline = []
         self.thermoclinefitline = []
         ##fnd reference pressure, this is done in holte and talley 
         ##supplementary matlab file
         startindex = np.argmin((np.asarray(pressures)-10)**2)
-        self.temperatures = temperatures[startindex:]
+        self.densities = densities[startindex:]
         self.pressures = pressures[startindex:]
-        self.temperatureGradients= self.generateGradientList()
+        self.densityGradients= self.generateGradientList()
         self.TMax = int(self.calculateTMax())
         self.TMaxPressure = pressures[self.TMax]
         self.MLTFIT = int(self.calculateMLTFIT())
@@ -32,8 +32,8 @@ class tempProfile:
 
     def generateGradientList(self):
         tGS=[]
-        for index in range(len(self.temperatures)-1):
-            dt = float(self.temperatures[index] - self.temperatures[index+1])
+        for index in range(len(self.densities)-1):
+            dt = float(self.densities[index] - self.densities[index+1])
             dp = float(self.pressures[index] - self.pressures[index+1])
             tGS.append(dt/dp)
         smoothed=[0]*len(tGS)
@@ -43,22 +43,22 @@ class tempProfile:
             smoothed[i] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
         return tGS
 
-    #The temperature maximum
+    #The density maximum
     def calculateTMax(self):
         maxIndex = 0
-        for i in range(len(self.temperatures)):
-            print(self.temperatures[i])
-            if self.temperatures[i] >= self.temperatures[maxIndex]:
+        for i in range(len(self.densities)):
+            print(self.densities[i])
+            if self.densities[i] >= self.densities[maxIndex]:
                 maxIndex = i
         return maxIndex
 
-    #calculates the TTMLD or the temperature threshold mixed layer estimate
-    # based on a temperature threshold of 0.2
+    #calculates the TTMLD or the density threshold mixed layer estimate
+    # based on a density threshold of 0.2
     def calculateTTMLD(self):
         ref = np.argmin(abs(np.asarray(self.pressures) -10))
         print(ref)
         for index in range(0,len(self.pressures)):
-            if abs(self.temperatures[index] - self.temperatures[ref]) > 0.2:
+            if abs(self.densities[index] - self.densities[ref]) > 0.2:
                 return index
         return 0
 
@@ -70,7 +70,7 @@ class tempProfile:
         fits = []
         #iterate through and polyfit over progressively increasing points
         for num in range(2,len(self.pressures)):
-            out = np.polyfit(self.pressures[0:num],self.temperatures[0:num],1,full=True)
+            out = np.polyfit(self.pressures[0:num],self.densities[0:num],1,full=True)
             fits.append(out[0])
             if out[1]:
                 errors.append(out[1][0])
@@ -85,37 +85,37 @@ class tempProfile:
                break
         self.mltfitline=mltBestFit
         #find thermoclineFit
-        steepest = np.argmax(np.abs(self.temperatureGradients))
-        thermoclineFit = [self.temperatureGradients[steepest],
-            self.temperatures[steepest]-self.temperatureGradients[steepest]*self.pressures[steepest]
+        steepest = np.argmax(np.abs(self.densityGradients))
+        thermoclineFit = [self.densityGradients[steepest],
+            self.densities[steepest]-self.densityGradients[steepest]*self.pressures[steepest]
         ]
         self.thermoclinefitline = thermoclineFit
         depth = abs(float(thermoclineFit[1] - mltBestFit[1])/float(thermoclineFit[0] - mltBestFit[0]))
         return self.findNearestPressureIndex(depth)
 
-        # The temperature difference across the mltfit or T(i mltfit) - T(i mltfit + 2 )
+        # The density difference across the mltfit or T(i mltfit) - T(i mltfit + 2 )
     def calculateDeltaT(self):
-        if self.MLTFIT < len(self.temperatures)-2:
-            print(self.temperatures[self.MLTFIT])
-            print(self.temperatures[self.MLTFIT+2])
-            return float(self.temperatures[self.MLTFIT] - self.temperatures[self.MLTFIT+2])
-        return len(self.temperatures) -1
+        if self.MLTFIT < len(self.densities)-2:
+            print(self.densities[self.MLTFIT])
+            print(self.densities[self.MLTFIT+2])
+            return float(self.densities[self.MLTFIT] - self.densities[self.MLTFIT+2])
+        return len(self.densities) -1
 
     #The density gradient threshold or max if threshold not met
     def calculateDTM(self):
         maxIndex=0
-        for i in range(len(self.temperatureGradients)):
-            if abs(self.temperatureGradients[i]) > 0.005:
+        for i in range(len(self.densityGradients)):
+            if abs(self.densityGradients[i]) > 0.005:
                 return i
-            elif abs(self.temperatureGradients[i]) > self.temperatureGradients[maxIndex]:
+            elif abs(self.densityGradients[i]) > self.densityGradients[maxIndex]:
                 maxIndex=i
         return maxIndex
 
-    #The minimum of the depth of the temperature gradiet maximum and the temperature maximum
+    #The minimum of the depth of the density gradiet maximum and the density maximum
     def calculateTDTM(self):
         steepest=0
-        for i in range(len(self.temperatureGradients)):
-            if  (self.temperatureGradients[i]) > self.temperatureGradients[steepest]:
+        for i in range(len(self.densityGradients)):
+            if  (self.densityGradients[i]) > self.densityGradients[steepest]:
                 steepest=i
         if self.pressures[steepest] < self.pressures[self.TMax]:
             return steepest
