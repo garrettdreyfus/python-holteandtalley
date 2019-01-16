@@ -1,4 +1,4 @@
-#Holte and Talley Mixed Layer Depth algorithm
+# Holte and Talley Mixed Layer Depth algorithm
 
 The paper outlining this algorithm is [here](http://http://mixedlayer.ucsd.edu/data/HolteTalley2009.pdf)
 
