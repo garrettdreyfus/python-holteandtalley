@@ -20,8 +20,8 @@ ddmin -> DGradientThreshold
 mldepthptmp -> tp.TTMLD
 dtandtmax -> TDTM
 tmax -> Tmax
-
+dmin -> DMin
 
 dsmin -> SGradientMax
 dsanddsmin -> IntrusionDepth
-mixedt -> MLDT
+mixedt -> MLDTh

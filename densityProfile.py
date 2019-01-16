@@ -124,11 +124,11 @@ class densityProfile:
             densityGradientMax = np.argmax(self.densityGradients)
             ddiff = self.densities(densityGradientMax-1) - self.densities(densityGradientMax+1)
         #various constants from paper
-        if ddiff > -0.06 and self.dT > 0.5:
+        if ddiff > -0.06 and self.tp.dT > 0.5:
             return True
-        if ddiff > -0.06 and self.dT < -0.25:
+        if ddiff > -0.06 and self.tp.dT < -0.25:
             return False
-        if self.dT > -0.25 and self.dT < 0.5:
+        if self.tp.dT > -0.25 and self.tp.dT < 0.5:
             return True 
         else:
             return False
