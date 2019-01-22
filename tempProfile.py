@@ -3,9 +3,10 @@ class tempProfile:
     def __init__(self,pressures,temperatures):
         self.mltfitline = []
         self.thermoclinefitline = []
+        self.debug = 0
         ##fnd reference pressure, this is done in holte and talley 
         ##supplementary matlab file
-        startindex = np.argmin((np.asarray(pressures)-10)**2)
+        startindex = np.argmin((np.asarray(pressures)-10.0)**2)
         self.temperatures = temperatures[startindex:]
         self.pressures = pressures[startindex:]
         self.temperatureGradients= self.generateGradientList()
@@ -36,12 +37,10 @@ class tempProfile:
             dt = float(self.temperatures[index] - self.temperatures[index+1])
             dp = float(self.pressures[index] - self.pressures[index+1])
             tGS.append(dt/dp)
-        smoothed=[0]*len(tGS)
-        smoothed[0] = (tGS[0] + tGS[1])/2.0
-        smoothed[-1] = (tGS[-1] + tGS[-2])/2.0
+        smoothed=[0]*(len(tGS)-2)
         for i in range(1,len(tGS)-1):
-            smoothed[i] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
-        return tGS
+            smoothed[i-1] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
+        return smoothed
 
     #The temperature maximum
     def calculateTMax(self):
@@ -54,11 +53,10 @@ class tempProfile:
     #calculates the TTMLD or the temperature threshold mixed layer estimate
     # based on a temperature threshold of 0.2
     def calculateTTMLD(self):
-        ref = np.argmin(abs(np.asarray(self.pressures) -10))
-        print(ref)
+        #PRESSURE INTERPOLATE
         for index in range(0,len(self.pressures)):
-            if abs(self.temperatures[index] - self.temperatures[ref]) > 0.2:
-                return index
+            if abs(self.temperatures[index] - self.temperatures[0]) > 0.2:
+                return index+1
         return 0
 
     # calculates the MLTFIT or the intersection of the best fit mixed layer line
@@ -95,8 +93,6 @@ class tempProfile:
         # The temperature difference across the mltfit or T(i mltfit) - T(i mltfit + 2 )
     def calculateDeltaT(self):
         if self.MLTFIT < len(self.temperatures)-2:
-            print(self.temperatures[self.MLTFIT])
-            print(self.temperatures[self.MLTFIT+2])
             return float(self.temperatures[self.MLTFIT] - self.temperatures[self.MLTFIT+2])
         return len(self.temperatures) -1
 
@@ -104,10 +100,11 @@ class tempProfile:
     def calculateDTM(self):
         maxIndex=0
         for i in range(len(self.temperatureGradients)):
-            if abs(self.temperatureGradients[i]) > 0.005:
-                return i
+            if abs(self.temperatureGradients[i]) > 0.005 :
+                self.debug=self.pressures[i+2] - self.pressures[i+1]
+                return i+1
             elif abs(self.temperatureGradients[i]) > self.temperatureGradients[maxIndex]:
-                maxIndex=i
+                maxIndex=i+1
         return maxIndex
 
     #The minimum of the depth of the temperature gradiet maximum and the temperature maximum
@@ -185,7 +182,7 @@ class tempProfile:
                 MLD = self.TTMLDPressure
         return MLD
 
-    def findTemperatureMLD(self):
+    def findMLD(self):
         if self.dT > 0.5 or self.dT < -0.25:
             self.foundMLD = self.mldSummerProfile()
         else:

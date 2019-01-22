@@ -13,13 +13,13 @@ class densityProfile:
             self.sp = tempProfile(pressures,temperatures)
         else:
             self.sp = sp
-        self.tp.findTemperatureMLD()
+        self.tp.findMLD()
         self.MLDT = self.tp.foundMLD
         self.sp.findMLD()
         self.MLDS = self.sp.foundMLD
         ##fnd reference pressure, this is done in holte and talley 
         ##supplementary matlab file
-        startindex = np.argmin((np.asarray(pressures)-10)**2)
+        startindex = np.argmin((np.asarray(pressures)-10.0)**2)
         self.salinities = salinities[startindex:]
         self.pressures = pressures[startindex:]
         self.densities = densities[startindex:]
@@ -58,7 +58,7 @@ class densityProfile:
         smoothed[-1] = (tGS[-1] + tGS[-2])/2.0
         for i in range(1,len(tGS)-1):
             smoothed[i] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
-        return tGS
+        return smoothed
 
     #The Density Maximum
     #Closest paper equivalent TMAX
@@ -78,10 +78,10 @@ class densityProfile:
     #Calculates the densityGradient threshold or max if criteria not met
     #closest to DTM
     def calculateDGradientThreshold(self):
-        for index in range(0,len(self.pressures)):
-            if abs(self.densityGradients[index] - self.densityGradients[0]) > 0.0005:
-                return index
-        return np.argmax(self.densityGradients)
+        for index in range(0,len(self.densityGradients)):
+            if abs(self.densityGradients[index]) > 0.0005:
+                return index+1
+        return np.argmax(self.densityGradients)+1
 
     # calculates the MLTFIT or the intersection of the best fit mixed layer line
     # and the best fit of the thermocline
@@ -160,7 +160,7 @@ class densityProfile:
         if self.tp.TDTMPressure > self.range and self.tp.TDTMPressure < self.DThresholdPressure:
             MLD= self.tp.TDTMPressure
             if abs(self.tp.TMaxPressure - self.DThresholdPressure) < abs(self.tp.TDTMPressure - self.MLTFITPressure):
-                MLD = self.tp.TmaxPressure
+                MLD = self.tp.TMaxPressure
             if abs(self.MLDS - self.DThresholdPressure) < self.range and self.MLDS < self.DThresholdPressure:
                 MLD = min(self.DThresholdPressure,self.MLDS)
         if abs(self.MLDT - self.MLDS) < self.range and abs(min(self.MLDT,self.MLDS))-MLD > self.range:
@@ -199,10 +199,8 @@ class densityProfile:
 
     def findMLD(self):
         if self.sp.densityTest:
-            print("winter")
             self.foundMLD =  self.mldWinterProfile()
         else:
-            print("summer")
             self.foundMLD = self.mldSummerProfile()
         return self.foundMLD
 

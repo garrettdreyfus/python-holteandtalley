@@ -6,7 +6,7 @@ class salinityProfile:
         self.thermoclinefitline = []
         if tp == None:
             tp = tempProfile(pressures,temperatures)
-        tp.findTemperatureMLD()
+        tp.findMLD()
         self.MLDT = tp.foundMLD
         self.dT = tp.dT
         ##fnd reference pressure, this is done in holte and talley 
@@ -50,7 +50,7 @@ class salinityProfile:
         smoothed[-1] = (tGS[-1] + tGS[-2])/2.0
         for i in range(1,len(tGS)-1):
             smoothed[i] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
-        return tGS
+        return smoothed
 
     #The salinity minimum
     #Closest paper equivalent TMAX
@@ -110,7 +110,7 @@ class salinityProfile:
             ddiff = self.densities[self.MLTFIT]-self.densities[self.MLTFIT+2]
         else:
             densityGradientMax = np.argmax(self.densityGradients)
-            ddiff = self.densities(densityGradientMax-1) - self.densities(densityGradientMax+1)
+            ddiff = self.densities[densityGradientMax-1] - self.densities[densityGradientMax+1]
         #various constants from paper
         if ddiff > -0.06 and self.dT > 0.5:
             return 1
@@ -179,10 +179,8 @@ class salinityProfile:
 
     def findMLD(self):
         if self.densityTest:
-            print("winter")
             self.foundMLD =  self.mldWinterProfile()
         else:
-            print("summer")
             self.foundMLD = self.mldSummerProfile()
         return self.foundMLD
 
