@@ -40,7 +40,7 @@ for file in os.listdir("profiles"):
             salts = saltsa
             temps = tempsa
         if np.where(np.where(pressures) ==99999)[0]<5:
-            print("well shit")
+            print("well shucks")
         else:
             tempsOut=[]
             pressuresOut=[]
