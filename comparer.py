@@ -11,8 +11,10 @@ with open("matOutput.pickle","rb") as f:
 deltas = {"salinityAlgoD":[],"densityAlgoD":[],"temperatureAlgoD":[],
         "densityThresholdD":[],"temperatureThresholdD":[],
         "densityGradientD":[],"temperatureGradientD":[],
-        "debug":[]
+        "debug":[],"id":[]
 }
+
+higherror = []
 for i in pythonOutput:
     try:
         matout = matlabOutput[(int(i["platformNumber"]),i["cycleNumber"])]
@@ -37,4 +39,10 @@ for i in pythonOutput:
     deltas["temperatureAlgoD"].append(dt)
     deltas["densityAlgoD"].append(dd)
     deltas["debug"].append(i["debug"])
+    #deltas["id"].append((int(i["platformNumber"]),i["cycleNumber"]))
+    if abs(i["tempGradient"] - matout["tempGradient"]) > 20:
+        higherror.append(((int(i["platformNumber"]),i["cycleNumber"]),i["tempGradient"],matout["tempGradient"]))
+
 print(deltas)
+#print(higherror)
+        

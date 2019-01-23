@@ -30,6 +30,7 @@ class densityProfile:
         self.MLTFITPressure = pressures[self.MLTFIT]
         self.DThreshold = int(self.calculateDThreshold())
         self.DThresholdPressure = pressures[self.DThreshold]
+        self.DThresholdPressure = self.interpolateDThreshold()
         self.DGradientThreshold = int(self.calculateDGradientThreshold())
         self.DGradientThresholdPressure = pressures[self.DGradientThreshold]
         self.densityTest = sp.calculateDensityTest()
@@ -53,11 +54,9 @@ class densityProfile:
             dt = float(values[index] - values[index+1])
             dp = float(self.pressures[index] - self.pressures[index+1])
             tGS.append(dt/dp)
-        smoothed=[0]*len(tGS)
-        smoothed[0] = (tGS[0] + tGS[1])/2.0
-        smoothed[-1] = (tGS[-1] + tGS[-2])/2.0
+        smoothed=[0]*(len(tGS)-2)
         for i in range(1,len(tGS)-1):
-            smoothed[i] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
+            smoothed[i-1] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
         return smoothed
 
     #The Density Maximum
@@ -75,12 +74,24 @@ class densityProfile:
                 return index
         return 0
 
+    def interpolateDThreshold(self):
+        if self.DThreshold:
+            thresholdIndex = self.DThreshold
+        else:
+            thresholdIndex = int(self.calculateDThreshold())
+        deltaP = (self.pressures[thresholdIndex] - self.pressures[thresholdIndex-1])
+        deltaD = (self.densities[thresholdIndex] - self.densities[thresholdIndex-1])
+        return self.pressures[thresholdIndex-1] + (deltaP/deltaD)*(self.densities[0]+0.03-abs(self.densities[thresholdIndex-1]))
+        #return self.pressures[thresholdIndex]
+
+        
+
     #Calculates the densityGradient threshold or max if criteria not met
     #closest to DTM
     def calculateDGradientThreshold(self):
         for index in range(0,len(self.densityGradients)):
             if abs(self.densityGradients[index]) > 0.0005:
-                return index+1
+                return index+2
         return np.argmax(self.densityGradients)+1
 
     # calculates the MLTFIT or the intersection of the best fit mixed layer line

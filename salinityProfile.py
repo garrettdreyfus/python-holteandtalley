@@ -45,11 +45,9 @@ class salinityProfile:
             dt = float(values[index] - values[index+1])
             dp = float(self.pressures[index] - self.pressures[index+1])
             tGS.append(dt/dp)
-        smoothed=[0]*len(tGS)
-        smoothed[0] = (tGS[0] + tGS[1])/2.0
-        smoothed[-1] = (tGS[-1] + tGS[-2])/2.0
+        smoothed=[0]*(len(tGS)-2)
         for i in range(1,len(tGS)-1):
-            smoothed[i] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
+            smoothed[i-1] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
         return smoothed
 
     #The salinity minimum
@@ -124,7 +122,7 @@ class salinityProfile:
     #The salinity gradient threshold or max if threshold not met
     # Matlab: dsmin (confusingly named I know)
     def calculateSGradientMax(self):
-        return np.argmax(self.salinityGradients)
+        return np.argmax(self.salinityGradients)+1
 
     #The minimum of the depth of the salinity gradiet maximum and the salinity minimum
     #In matlab file: dsandsmin

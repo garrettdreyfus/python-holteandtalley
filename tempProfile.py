@@ -15,7 +15,7 @@ class tempProfile:
         self.MLTFIT = int(self.calculateMLTFIT())
         self.MLTFITPressure = pressures[self.MLTFIT]
         self.TTMLD = int(self.calculateTTMLD())
-        self.TTMLDPressure = pressures[self.TTMLD]
+        self.TTMLDPressure = self.interpolateTTMLD()
         self.dT = self.calculateDeltaT()
         self.DTM = int(self.calculateDTM())
         self.DTMPressure = self.pressures[self.DTM]
@@ -53,11 +53,24 @@ class tempProfile:
     #calculates the TTMLD or the temperature threshold mixed layer estimate
     # based on a temperature threshold of 0.2
     def calculateTTMLD(self):
-        #PRESSURE INTERPOLATE
         for index in range(0,len(self.pressures)):
             if abs(self.temperatures[index] - self.temperatures[0]) > 0.2:
-                return index+1
+                return index
         return 0
+
+    def interpolateTTMLD(self):
+        if self.TTMLD:
+            thresholdIndex = self.TTMLD
+        else:
+            thresholdIndex = int(self.calculateTTMLD())
+        if thresholdIndex ==0:
+            return self.pressures[thresholdIndex]
+        deltaP = (self.pressures[thresholdIndex] - self.pressures[thresholdIndex-1])
+        deltaT = (self.temperatures[thresholdIndex] - self.temperatures[thresholdIndex-1])
+        return self.pressures[thresholdIndex-1] + (deltaP/deltaT)*((self.temperatures[0]-0.2)-self.temperatures[thresholdIndex-1])
+        #return self.pressures[thresholdIndex]# + (deltaP/deltaT)*(0.03-abs(self.temperatures[thresholdIndex-1]))
+
+
 
     # calculates the MLTFIT or the intersection of the best fit mixed layer line
     # and the best fit of the thermocline
@@ -101,12 +114,10 @@ class tempProfile:
         maxIndex=0
         for i in range(len(self.temperatureGradients)):
             if abs(self.temperatureGradients[i]) > 0.005 :
-                self.debug=self.pressures[i+2] - self.pressures[i+1]
                 return i+1
             elif abs(self.temperatureGradients[i]) > self.temperatureGradients[maxIndex]:
                 maxIndex=i+1
         return maxIndex
-
     #The minimum of the depth of the temperature gradiet maximum and the temperature maximum
     def calculateTDTM(self):
         steepest=0
