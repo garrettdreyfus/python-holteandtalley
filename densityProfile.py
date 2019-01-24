@@ -81,7 +81,10 @@ class densityProfile:
             thresholdIndex = int(self.calculateDThreshold())
         deltaP = (self.pressures[thresholdIndex] - self.pressures[thresholdIndex-1])
         deltaD = (self.densities[thresholdIndex] - self.densities[thresholdIndex-1])
-        return self.pressures[thresholdIndex-1] + (deltaP/deltaD)*(self.densities[0]+0.03-abs(self.densities[thresholdIndex-1]))
+        if self.densities[thresholdIndex] > self.densities[thresholdIndex-1]:
+            return self.pressures[thresholdIndex-1] + (deltaP/deltaD)*(self.densities[0]+0.03-abs(self.densities[thresholdIndex-1]))
+        elif self.densities[thresholdIndex] < self.densities[thresholdIndex-1]:
+            return self.pressures[thresholdIndex-1] + (deltaP/deltaD)*(self.densities[0]-0.03-abs(self.densities[thresholdIndex-1]))
         #return self.pressures[thresholdIndex]
 
         

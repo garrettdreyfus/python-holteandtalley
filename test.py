@@ -76,19 +76,20 @@ for file in os.listdir("profiles"):
             line["densityThreshold"] = d.DThresholdPressure 
             line["densityGradient"] = d.DGradientThresholdPressure
             line["cycleNumber"] = cycleNumber
+            line["tempMLTFIT"] = t.MLTFITPressure
+            line["mltFitIndex"] = t.mltfitindex
             line["debug"] = t.debug
+            line["steepest"] = t.steepest
             out.append(line)
-            #print(s)k
-            #profilePlotter(salinities,pressures,s.foundMLD,s.importantDepths(),"Salinities",
-                #str(dataset.variables["LATITUDE"][0]),
-                #str(dataset.variables["LONGITUDE"][0]),
-                #str(s.path)
-                #)
-            #print(d)
-            #profilePlotter(densities,pressures,d.foundMLD,d.importantDepths(),"Densities",
-                #str(dataset.variables["LATITUDE"][0]),
-                #str(dataset.variables["LONGITUDE"][0]),
-                #str(d.path)
-            #)
+            if int(num) == 3900623 and cycleNumber == 24:
+                print("MLTFIT: ", t.MLTFITPressure)
+                print("DTM: ",t.DTMPressure)
+                print("TTMLD: ",t.TTMLDPressure)
+                print("TDTM: ",t.TDTMPressure)
+                print("TMAX: ",t.TMaxPressure)
+                print(t.debug)
+                print(t.mltfitindex)
+                print(t.temperatureGradients)
+                #profilePlotter(t.temperatures,t.pressures,t.MLTFITPressure,[],"","","","")
 with open("pyOutput.pickle","wb") as f:
     pickle.dump(out,f)
