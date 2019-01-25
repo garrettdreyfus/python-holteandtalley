@@ -77,19 +77,27 @@ for file in os.listdir("profiles"):
             line["densityGradient"] = d.DGradientThresholdPressure
             line["cycleNumber"] = cycleNumber
             line["tempMLTFIT"] = t.MLTFITPressure
-            line["mltFitIndex"] = t.mltfitindex
-            line["debug"] = t.debug
+            line["tempMLTFITIndex"] = t.mltfitindex
+            line["densityMLTFIT"] = d.MLTFITPressure
+            line["salinityMLTFIT"] = s.MLTFITPressure
+            line["debug"] = s.debug
             line["steepest"] = t.steepest
             out.append(line)
-            if int(num) == 3900623 and cycleNumber == 24:
-                print("MLTFIT: ", t.MLTFITPressure)
-                print("DTM: ",t.DTMPressure)
-                print("TTMLD: ",t.TTMLDPressure)
-                print("TDTM: ",t.TDTMPressure)
-                print("TMAX: ",t.TMaxPressure)
-                print(t.debug)
-                print(t.mltfitindex)
-                print(t.temperatureGradients)
-                #profilePlotter(t.temperatures,t.pressures,t.MLTFITPressure,[],"","","","")
+            if int(num) == 3900622 and cycleNumber == 22:
+                print("MLTFIT: ", s.MLTFITPressure)
+                print("D Threshold: ",s.DThresholdPressure)
+                print("DMIN: ",s.SGradientMax)
+                print(s.pressures[s.MLTFIT] - s.pressures[s.MLTFIT +1])
+                #=====
+                #print("MLTFIT: ", d.MLTFITPressure)
+                #print("D Threshold: ",d.DThresholdPressure)
+                #print("D Gradient Threshold: ",d.DGradientThresholdPressure)
+                #print("DMIN: ",d.DMinPressure)
+                #====
+                #print("TMAX: ",d.TMaxPressure)
+                #print(d.debug)
+                #print(t.mltfitindex)
+                #print(t.temperatureGradients)
+                profilePlotter(s.salinities,s.pressures,s.MLTFITPressure,[],"","","","")
 with open("pyOutput.pickle","wb") as f:
     pickle.dump(out,f)

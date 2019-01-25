@@ -11,7 +11,8 @@ with open("matOutput.pickle","rb") as f:
 deltas = {"salinityAlgoD":[],"densityAlgoD":[],"temperatureAlgoD":[],
         "densityThresholdD":[],"temperatureThresholdD":[],
         "densityGradientD":[],"temperatureGradientD":[],"tempMLTFITD":[],
-        "debug":[],"id":[],"mltFitIndex":[],"steepest":[]
+        "debug":[],"id":[],"tempMLTFITIndex":[],"steepest":[],"densityMLTFITD":[],
+        "salinityMLTFITD":[]
 }
 
 higherror = []
@@ -38,19 +39,25 @@ for i in pythonOutput:
     deltas["tempMLTFITD"].append(
         round(i["tempMLTFIT"] - matout["tempMLTFIT"],1)
     )
-    deltas["mltFitIndex"].append(
-        i["mltFitIndex"] - matout["mltFitIndex"]
+    deltas["tempMLTFITIndex"].append(
+        i["tempMLTFITIndex"] - matout["tempMLTFITIndex"]
     )
     deltas["steepest"].append(
         i["steepest"] - matout["steepest"]
+    )
+    deltas["densityMLTFITD"].append(
+        round(i["densityMLTFIT"] - matout["densityMLTFIT"],1)
+    )
+    deltas["salinityMLTFITD"].append(
+        round(i["salinityMLTFIT"] - matout["salinityMLTFIT"],1)
     )
     deltas["salinityAlgoD"].append(ds)
     deltas["temperatureAlgoD"].append(dt)
     deltas["densityAlgoD"].append(dd)
     deltas["debug"].append(i["debug"])
     #deltas["id"].append((int(i["platformNumber"]),i["cycleNumber"]))
-    if abs(dt) > 10:
-        higherror.append(((int(i["platformNumber"]),i["cycleNumber"]),i["tempAlgo"],matout["tempAlgo"],i["debug"]))
+    if abs(round(i["salinityMLTFIT"] - matout["salinityMLTFIT"],1)) > 10:
+        higherror.append(((int(i["platformNumber"]),i["cycleNumber"]),i["salinityMLTFIT"],matout["salinityMLTFIT"],i["debug"]))
 
 print(deltas)
 print(higherror)

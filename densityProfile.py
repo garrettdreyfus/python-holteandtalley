@@ -27,7 +27,7 @@ class densityProfile:
         self.DMin = int(self.calculateDMin())
         self.DMinPressure = pressures[self.DMin]
         self.MLTFIT = int(self.calculateMLTFIT(self.densities,self.densityGradients))
-        self.MLTFITPressure = pressures[self.MLTFIT]
+        #self.MLTFITPressure = pressures[self.MLTFIT]
         self.DThreshold = int(self.calculateDThreshold())
         self.DThresholdPressure = pressures[self.DThreshold]
         self.DThresholdPressure = self.interpolateDThreshold()
@@ -40,6 +40,7 @@ class densityProfile:
         #self.intrusionDepthPressure = self.pressures[self.intrusionDepth]
         self.foundMLD=0
         self.path=""
+        self.debug=""
         #range from paper
         self.range = 25
         return
@@ -122,12 +123,14 @@ class densityProfile:
                break
         self.mltfitline=mltBestFit
         #find thermoclineFit
-        steepest = np.argmax(np.abs(gradients))
-        thermoclineFit = [gradients[steepest],
-            values[steepest]-gradients[steepest]*self.pressures[steepest]
-        ]
+        steepest = np.argmax(np.abs(self.densityGradients))+1
+        #thermoclineFit = [gradients[steepest],
+            #values[steepest]-gradients[steepest]*self.pressures[steepest]
+        #]
+        thermoclineFit = np.polyfit(self.pressures[steepest-1:steepest+2],self.densities[steepest-1:steepest+2],1,full=True)[0]
         self.thermoclinefitline = thermoclineFit
         depth = abs(float(thermoclineFit[1] - mltBestFit[1])/float(thermoclineFit[0] - mltBestFit[0]))
+        self.MLTFITPressure = depth
         return self.findNearestPressureIndex(depth)
 
     # TESTD from matlab file
@@ -167,31 +170,43 @@ class densityProfile:
     #Based on find_mld.m from Holte and Talley Suplementary materials
     def mldWinterProfile(self):
         MLD = self.DThresholdPressure
+        self.debug = "D threshold zip"
         if self.tp.TTMLDPressure < MLD:
             MLD = self.tp.TTMLDPressure
+            self.debug = "TTMLD zap"
         if self.MLTFITPressure < self.DThresholdPressure and self.MLTFITPressure > self.range:
             MLD = self.MLTFITPressure
+            self.debug = "MLTFIT zip"
         if self.tp.TDTMPressure > self.range and self.tp.TDTMPressure < self.DThresholdPressure:
             MLD= self.tp.TDTMPressure
+            self.debug = "TDTM zip"
             if abs(self.tp.TMaxPressure - self.DThresholdPressure) < abs(self.tp.TDTMPressure - self.MLTFITPressure):
                 MLD = self.tp.TMaxPressure
+                self.debug = "TMAX zip"
             if abs(self.MLDS - self.DThresholdPressure) < self.range and self.MLDS < self.DThresholdPressure:
                 MLD = min(self.DThresholdPressure,self.MLDS)
+                self.debug = "DThreshold zap"
         if abs(self.MLDT - self.MLDS) < self.range and abs(min(self.MLDT,self.MLDS))-MLD > self.range:
             MLD = min(self.MLDT,self.MLDS)
+            self.debug = "Min of MLDT and MLDS zip"
         if MLD > self.DGradientThresholdPressure and abs(self.DGradientThresholdPressure - self.MLDT) < abs(MLD-self.MLDT):
             MLD = self.DGradientThresholdPressure
+            self.debug = "D Gradient Threshold zip"
         if self.MLTFITPressure == self.sp.MLTFITPressure and abs(self.sp.MLTFITPressure - self.DThresholdPressure) < self.range:
             MLD= self.MLTFITPressure
+            self.debug = "MLTIT zap"
         if self.MLDT == self.DMinPressure:
             MLD = self.DMinPressure
+            self.debug = "Dmin zip"
         return MLD
 
     #Based on find_mld.m from Holte and Talley Suplementary materials
     def mldSummerProfile(self):
         MLD = self.MLTFITPressure
+        self.debug = "MLTFIT zip"
         if MLD > self.MLTFITPressure:
             MLD = self.DThresholdPressure
+            self.debug = "D treshold zap"
         ## If any two of these three conditions are true
         conditions = [abs(self.MLDS-self.MLDT),abs(self.MLTFITPressure-self.MLDT),abs(self.MLDS - self.MLTFITPressure)]
         s =0
@@ -200,15 +215,20 @@ class densityProfile:
                 s+=1
         if s >1:
             MLD = self.MLTFITPressure
+            self.debug = "MLTFIT zap"
         if abs(self.MLDS - self.DThresholdPressure) < self.range and self.MLDS != self.DThresholdPressure:
             if self.DThresholdPressure < self.MLDS:
                 MLD = self.DThresholdPressure
+                self.debug = "D treshold zop"
             else:
                 MLD = self.MLDS
+                self.debug = "MLDS zip"
             if self.MLTFITPressure == self.DThresholdPressure:
                 MLD = self.MLTFITPressure
-        if MLD > self.DGradientThresholdPressure and abs(self.DGradientThresholdPressure - self.MLDT):
-           MLD = self.DGradientThresholdPressure 
+                self.debug = "MLTFIT zap"
+        if MLD > self.DGradientThresholdPressure and abs(self.DGradientThresholdPressure - self.MLDT) < abs(MLD - self.MLDT):
+            MLD = self.DGradientThresholdPressure 
+            self.debug = "D Gradient Threshold zap"
         return MLD
 
     def findMLD(self):
