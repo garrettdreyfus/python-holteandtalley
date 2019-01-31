@@ -39,7 +39,7 @@ for file in os.listdir("profiles"):
             pressures =pressuresa
             salts = saltsa
             temps = tempsa
-        if np.where(np.where(pressures) ==99999)[0]<5:
+        if len(np.where(np.where(pressures) ==99999))>1 and np.where(np.where(pressures) ==99999)[0] <5:
             print("well shucks")
         else:
             tempsOut=[]
@@ -84,23 +84,23 @@ for file in os.listdir("profiles"):
             line["debug"] = d.debug
             line["steepest"] = s.steepest
             out.append(line)
-            if int(num) == 3900623 and cycleNumber == 3:
-                print("MLTFIT: ", s.MLTFITPressure)
-                #print("MLTFITINDEX: ",s.mltfitindex)
-                print("D Threshold: ",s.DThresholdPressure)
-                #print("DMIN: ",s.SGradientMax)
-                #print(s.intrusionDepthPressure)
-                #print(d.MLDT,d.DThresholdPressure)
-                #=====
-                #print("MLTFIT: ", d.MLTFITPressure)
-                #print("D Threshold: ",d.DThresholdPressure)
-                #print("D Gradient Threshold: ",d.DGradientThresholdPressure)
-                #print("DMIN: ",d.DMinPressure)
-                #====
-                #print("TMAX: ",d.TMaxPressure)
-                #print(d.debug)
-                #print(t.mltfitindex)
-                #print(t.temperatureGradients)
-                profilePlotter(s.salinities,s.pressures,s.MLTFITPressure,[],"","","","")
+            #if int(num) == 3900623 and cycleNumber == 3:
+                #print("MLTFIT: ", s.MLTFITPressure)
+                ##print("MLTFITINDEX: ",s.mltfitindex)
+                #print("D Threshold: ",s.DThresholdPressure)
+                ##print("DMIN: ",s.SGradientMax)
+                ##print(s.intrusionDepthPressure)
+                ##print(d.MLDT,d.DThresholdPressure)
+                ##=====
+                ##print("MLTFIT: ", d.MLTFITPressure)
+                ##print("D Threshold: ",d.DThresholdPressure)
+                ##print("D Gradient Threshold: ",d.DGradientThresholdPressure)
+                ##print("DMIN: ",d.DMinPressure)
+                ##====
+                ##print("TMAX: ",d.TMaxPressure)
+                ##print(d.debug)
+                ##print(t.mltfitindex)
+                ##print(t.temperatureGradients)
+                #profilePlotter(s.salinities,s.pressures,s.MLTFITPressure,[],"","","","")
 with open("pyOutput.pickle","wb") as f:
     pickle.dump(out,f)
