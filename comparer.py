@@ -1,4 +1,5 @@
 import pickle
+import math
 import numpy as np
 matlabOutput={}
 pythonOutput={}
@@ -57,8 +58,8 @@ for i in pythonOutput:
     deltas["densityAlgoD"].append(dd)
     deltas["debug"].append(i["debug"])
     #deltas["id"].append((int(i["platformNumber"]),i["cycleNumber"]))
-    if abs(round(i["salinityAlgo"] - matout["salinityAlgo"],1)) > 30:
-        higherror.append(((int(i["platformNumber"]),i["cycleNumber"]),i["salinityAlgo"],matout["salinityAlgo"],i["debug"]))
+    if abs(i["densityAlgo"] - matout["densityAlgo"]) > 10:
+        higherror.append(((int(i["platformNumber"]),i["cycleNumber"]),i["tempAlgo"],matout["tempAlgo"],i["salinityAlgo"],matout["salinityAlgo"],i["debug"]))
 print(deltas)
 print(higherror)
 print("mean sal d",sum(np.abs(deltas["salinityAlgoD"]))/len(deltas["salinityAlgoD"]))

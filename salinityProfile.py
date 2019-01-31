@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from tempProfile import tempProfile
 class salinityProfile:
     def __init__(self,pressures,temperatures,salinities,densities,tp=None):
@@ -7,7 +8,7 @@ class salinityProfile:
         if tp == None:
             tp = tempProfile(pressures,temperatures)
         tp.findMLD()
-        self.MLDT = tp.foundMLD
+        self.MLDT = int(tp.foundMLD)
         self.dT = tp.dT
         ##fnd reference pressure, this is done in holte and talley 
         ##supplementary matlab file
@@ -21,7 +22,7 @@ class salinityProfile:
         self.MLTFIT, self.MLTFITPressure = self.calculateMLTFIT(self.salinities,self.salinityGradients)
         self.MLTFITDensity, self.MLTFITDensityPressure = self.calculateMLTFIT(self.densities,self.densityGradients)
         self.DThreshold = int(self.calculateDThreshold())
-        self.DThresholdPressure = self.interpolateDThreshold()
+        self.DThresholdPressure = math.floor(self.interpolateDThreshold()*2)/2.0
         self.densityTest = self.calculateDensityTest()
         self.SGradientMax = int(self.calculateSGradientMax())
         self.SGradientMaxPressure = self.pressures[self.SGradientMax]
@@ -70,8 +71,6 @@ class salinityProfile:
         elif self.densities[thresholdIndex] < self.densities[thresholdIndex-1]:
             return self.pressures[thresholdIndex-1] + (deltaP/deltaD)*(self.densities[0]-0.03-abs(self.densities[thresholdIndex-1]))
         #return self.pressures[thresholdIndex]
-
-
     # calculates the MLTFIT or the intersection of the best fit mixed layer line
     # and the best fit of the thermocline
     #Matlab equivalent: upperdsmax
@@ -114,7 +113,7 @@ class salinityProfile:
     # TESTD from matlab file
     def calculateDensityTest(self):
         if self.MLTFITDensity > 0 and self.MLTFITDensity < len(self.pressures)-2:
-            ddiff = self.densities[self.MLTFIT]-self.densities[self.MLTFIT+2]
+            ddiff = self.densities[self.MLTFITDensity]-self.densities[self.MLTFITDensity+2]
         else:
             densityGradientMax = np.argmax(np.abs(self.densityGradients))+1
             ddiff = self.densities[densityGradientMax-1] - self.densities[densityGradientMax+1]
@@ -123,10 +122,11 @@ class salinityProfile:
             return 1
         if ddiff > -0.06 and self.dT < -0.25:
             return 0
-        if self.dT > -0.25 and self.dT < 0.5:
-            return 1 
+        if self.dT > 0.5 or self.dT < -0.25:
+            self.ddiff = [ddiff, self.dT]
+            return 0 
         else:
-            return 0
+            return 1
 
     #The salinity gradient threshold or max if threshold not met
     # Matlab: dsmin (confusingly named I know)
@@ -139,10 +139,7 @@ class salinityProfile:
         x = np.argwhere(self.salinityGradients == np.min(self.salinityGradients))[-1][0]+1
         y =  np.argwhere(self.salinities == np.min(self.salinities))[-1][0]
         if abs(self.pressures[y] - self.pressures[x] ) < 100:
-            if y < x:
-                return y
-            else:
-                return x
+            return min(y,x)
         else:
             return 0
 
@@ -178,7 +175,7 @@ class salinityProfile:
 
     #Based on find_mld.m from Holte and Talley Suplementary materials
     def mldSummerProfile(self):
-        MLD = self.MLTFIT
+        MLD = self.MLTFITPressure
         self.debug = "MLTFIT zoop"
         if MLD - self.DThresholdPressure > self.range:
             MLD = self.DThresholdPressure
@@ -186,9 +183,12 @@ class salinityProfile:
         if self.MLTFITPressure - self.SGradientMaxPressure < 0 and self.DThresholdPressure - self.SGradientMaxPressure > 0:
             MLD = self.SGradientMaxPressure
             self.debug = "SGRadientMax zop"
-        if abs(self.MLTFITPressure - self.intrusionDepthPressure) < self.range and self.intrusionDepthPressure > self.range:
+        if self.MLTFITPressure - self.intrusionDepthPressure < self.range and self.intrusionDepthPressure > self.range:
             MLD = self.intrusionDepthPressure
-            self.debug = "SGRadientMax zap"
+            self.debug = "SGRadientMax zeepp"
+        if abs(self.DThresholdPressure - self.intrusionDepthPressure) < self.range and self.intrusionDepthPressure > self.range:
+            MLD = self.intrusionDepthPressure
+            self.debug = "IntrusionDeth zinc"
         if self.MLDT - self.DThresholdPressure < 0 and abs(self.MLDT - self.DThresholdPressure) < self.range:
             MLD = self.MLDT
             self.debug = "MLDT"
@@ -202,7 +202,7 @@ class salinityProfile:
         return MLD
 
     def findMLD(self):
-        if self.densityTest:
+        if self.densityTest == 1:
             self.foundMLD =  self.mldWinterProfile()
         else:
             self.foundMLD = self.mldSummerProfile()

@@ -81,15 +81,16 @@ for file in os.listdir("profiles"):
             line["densityMLTFIT"] = d.MLTFITPressure
             line["salinityMLTFIT"] = s.MLTFITPressure
             line["salinityMLTFITIndex"] = s.mltfitindex
-            line["debug"] = s.debug
+            line["debug"] = d.debug
             line["steepest"] = s.steepest
             out.append(line)
-            if int(num) == 3900621 and cycleNumber == 16:
+            if int(num) == 3900623 and cycleNumber == 3:
                 print("MLTFIT: ", s.MLTFITPressure)
-                print("MLTFITINDEX: ",s.mltfitindex)
+                #print("MLTFITINDEX: ",s.mltfitindex)
                 print("D Threshold: ",s.DThresholdPressure)
-                print("DMIN: ",s.SGradientMax)
-                print(s.intrusionDepthPressure)
+                #print("DMIN: ",s.SGradientMax)
+                #print(s.intrusionDepthPressure)
+                #print(d.MLDT,d.DThresholdPressure)
                 #=====
                 #print("MLTFIT: ", d.MLTFITPressure)
                 #print("D Threshold: ",d.DThresholdPressure)

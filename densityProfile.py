@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from tempProfile import tempProfile
 from salinityProfile import tempProfile
 class densityProfile:
@@ -26,11 +27,11 @@ class densityProfile:
         self.densityGradients = self.generateGradientList(self.densities)
         self.DMin = int(self.calculateDMin())
         self.DMinPressure = pressures[self.DMin]
-        self.MLTFIT = int(self.calculateMLTFIT(self.densities,self.densityGradients))
-        #self.MLTFITPressure = pressures[self.MLTFIT]
+        self.MLTFIT = int(self.calculateMLTFIT(self.densities,self.densityGradients))+1
+        self.MLTFITPressure = pressures[self.MLTFIT]
         self.DThreshold = int(self.calculateDThreshold())
         self.DThresholdPressure = pressures[self.DThreshold]
-        self.DThresholdPressure = self.interpolateDThreshold()
+        self.DThresholdPressure = math.floor(self.interpolateDThreshold()*2)/2.0
         self.DGradientThreshold = int(self.calculateDGradientThreshold())
         self.DGradientThresholdPressure = pressures[self.DGradientThreshold]
         self.densityTest = sp.calculateDensityTest()
@@ -138,20 +139,22 @@ class densityProfile:
 
     # TESTD from matlab file
     def calculateDensityTest(self):
-        if self.MLTFITDensity > 0 and self.MLTFITDensity < len(self.pressures)-2:
+        if self.MLTFIT > 0 and self.MLTFIT < len(self.pressures)-2:
             ddiff = self.densities[self.MLTFIT]-self.densities[self.MLTFIT+2]
         else:
-            densityGradientMax = np.argmax(self.densityGradients)
-            ddiff = self.densities(densityGradientMax-1) - self.densities(densityGradientMax+1)
+            densityGradientMax = np.argmax(np.abs(self.densityGradients))+1
+            ddiff = self.densities[densityGradientMax-1] - self.densities[densityGradientMax+1]
         #various constants from paper
-        if ddiff > -0.06 and self.tp.dT > 0.5:
-            return True
-        if ddiff > -0.06 and self.tp.dT < -0.25:
-            return False
-        if self.tp.dT > -0.25 and self.tp.dT < 0.5:
-            return True 
+        if ddiff > -0.06 and self.dT > 0.5:
+            return 1
+        if ddiff > -0.06 and self.dT < -0.25:
+            return 0
+        if self.dT > 0.5 or self.dT < -0.25:
+            return 0 
         else:
-            return False
+            return 1
+
+
 
     #The salinity gradient threshold or max if threshold not met
     # Matlab: dsmin (confusingly named I know)
@@ -207,7 +210,7 @@ class densityProfile:
     def mldSummerProfile(self):
         MLD = self.MLTFITPressure
         self.debug = "MLTFIT zip"
-        if MLD > self.MLTFITPressure:
+        if MLD > self.DThresholdPressure:
             MLD = self.DThresholdPressure
             self.debug = "D treshold zap"
         ## If any two of these three conditions are true

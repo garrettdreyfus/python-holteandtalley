@@ -109,11 +109,14 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +0 tempProfile.py
-badd +0 comparer.py
+badd +212 tempProfile.py
+badd +64 comparer.py
+badd +0 salinityProfile.py
+badd +5 equalities
+badd +93 test.py
 argglobal
 silent! argdel *
-edit tempProfile.py
+edit comparer.py
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -122,23 +125,17 @@ wincmd _ | wincmd |
 vsplit
 1wincmd h
 wincmd w
-wincmd _ | wincmd |
-split
-1wincmd k
-wincmd w
 wincmd w
 wincmd t
 set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '1resize ' . ((&lines * 26 + 21) / 42)
-exe 'vert 1resize ' . ((&columns * 86 + 86) / 173)
-exe '2resize ' . ((&lines * 12 + 21) / 42)
-exe 'vert 2resize ' . ((&columns * 86 + 86) / 173)
-exe '3resize ' . ((&lines * 13 + 21) / 42)
-exe 'vert 3resize ' . ((&columns * 86 + 86) / 173)
-exe '4resize ' . ((&lines * 12 + 21) / 42)
+exe '1resize ' . ((&lines * 19 + 21) / 42)
+exe 'vert 1resize ' . ((&columns * 72 + 86) / 173)
+exe '2resize ' . ((&lines * 19 + 21) / 42)
+exe 'vert 2resize ' . ((&columns * 100 + 86) / 173)
+exe '3resize ' . ((&lines * 19 + 21) / 42)
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -258,15 +255,20 @@ set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 39 - ((18 * winheight(0) + 13) / 26)
+let s:l = 61 - ((13 * winheight(0) + 9) / 19)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-39
-normal! 029|
+61
+let s:c = 163 - ((34 * winwidth(0) + 36) / 72)
+if s:c > 0
+  exe 'normal! ' . s:c . '|zs' . 163 . '|'
+else
+  normal! 0163|
+endif
 wincmd w
 argglobal
-if bufexists('comparer.py') | buffer comparer.py | else | edit comparer.py | endif
+if bufexists('salinityProfile.py') | buffer salinityProfile.py | else | edit salinityProfile.py | endif
 setlocal keymap=
 setlocal noarabic
 setlocal autoindent
@@ -385,15 +387,15 @@ set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 26 - ((7 * winheight(0) + 6) / 12)
+let s:l = 195 - ((5 * winheight(0) + 9) / 19)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-26
-normal! 05|
+195
+normal! 044|
 wincmd w
 argglobal
-terminal ++curwin ++cols=86 ++rows=13 
+terminal ++curwin ++cols=173 ++rows=19 
 setlocal keymap=
 setlocal noarabic
 setlocal autoindent
@@ -511,146 +513,19 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 6) / 13)
+let s:l = 2956 - ((0 * winheight(0) + 9) / 19)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
+2956
+normal! 083|
 wincmd w
-argglobal
-terminal ++curwin ++cols=173 ++rows=12 
-setlocal keymap=
-setlocal noarabic
-setlocal autoindent
-setlocal backupcopy=
-setlocal balloonexpr=
-setlocal nobinary
-setlocal nobreakindent
-setlocal breakindentopt=
-setlocal bufhidden=
-setlocal buflisted
-setlocal buftype=terminal
-setlocal cindent
-setlocal cinkeys=0{,0},0),:,0#,!^F,o,O,e
-setlocal cinoptions=
-setlocal cinwords=if,else,while,do,for,switch
-setlocal colorcolumn=
-setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
-setlocal commentstring=/*%s*/
-setlocal complete=.,w,b,u,t,i
-setlocal concealcursor=
-setlocal conceallevel=0
-setlocal completefunc=
-setlocal nocopyindent
-setlocal cryptmethod=
-setlocal nocursorbind
-setlocal nocursorcolumn
-setlocal nocursorline
-setlocal define=
-setlocal dictionary=
-setlocal nodiff
-setlocal equalprg=
-setlocal errorformat=
-setlocal noexpandtab
-if &filetype != ''
-setlocal filetype=
-endif
-setlocal fixendofline
-setlocal foldcolumn=0
-setlocal foldenable
-setlocal foldexpr=0
-setlocal foldignore=#
-setlocal foldlevel=0
-setlocal foldmarker={{{,}}}
-setlocal foldmethod=manual
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldtext=foldtext()
-setlocal formatexpr=
-setlocal formatoptions=tcq
-setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
-setlocal formatprg=
-setlocal grepprg=
-setlocal iminsert=0
-setlocal imsearch=-1
-setlocal include=
-setlocal includeexpr=
-setlocal indentexpr=
-setlocal indentkeys=0{,0},:,0#,!^F,o,O,e
-setlocal noinfercase
-setlocal iskeyword=@,48-57,_,192-255
-setlocal keywordprg=
-setlocal nolinebreak
-setlocal nolisp
-setlocal lispwords=
-setlocal nolist
-setlocal makeencoding=
-setlocal makeprg=
-setlocal matchpairs=(:),{:},[:]
-setlocal modeline
-setlocal nomodifiable
-setlocal nrformats=bin,octal,hex
-set number
-setlocal number
-setlocal numberwidth=4
-setlocal omnifunc=
-setlocal path=
-setlocal nopreserveindent
-setlocal nopreviewwindow
-setlocal quoteescape=\\
-setlocal noreadonly
-setlocal norelativenumber
-setlocal norightleft
-setlocal rightleftcmd=search
-setlocal noscrollbind
-setlocal shiftwidth=2
-setlocal noshortname
-setlocal signcolumn=auto
-setlocal smartindent
-setlocal softtabstop=0
-setlocal nospell
-setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
-setlocal spellfile=
-setlocal spelllang=en
-setlocal statusline=%!airline#statusline(4)
-setlocal suffixesadd=
-setlocal swapfile
-setlocal synmaxcol=3000
-if &syntax != ''
-setlocal syntax=
-endif
-setlocal tabstop=2
-setlocal tagcase=
-setlocal tags=
-setlocal termwinkey=
-setlocal termwinscroll=10000
-setlocal termwinsize=
-setlocal textwidth=0
-setlocal thesaurus=
-setlocal noundofile
-setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
-setlocal nowinfixheight
-setlocal nowinfixwidth
-set nowrap
-setlocal nowrap
-setlocal wrapmargin=0
-let s:l = 746 - ((5 * winheight(0) + 6) / 12)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-746
-normal! 038|
-wincmd w
-exe '1resize ' . ((&lines * 26 + 21) / 42)
-exe 'vert 1resize ' . ((&columns * 86 + 86) / 173)
-exe '2resize ' . ((&lines * 12 + 21) / 42)
-exe 'vert 2resize ' . ((&columns * 86 + 86) / 173)
-exe '3resize ' . ((&lines * 13 + 21) / 42)
-exe 'vert 3resize ' . ((&columns * 86 + 86) / 173)
-exe '4resize ' . ((&lines * 12 + 21) / 42)
+2wincmd w
+exe '1resize ' . ((&lines * 19 + 21) / 42)
+exe 'vert 1resize ' . ((&columns * 72 + 86) / 173)
+exe '2resize ' . ((&lines * 19 + 21) / 42)
+exe 'vert 2resize ' . ((&columns * 100 + 86) / 173)
+exe '3resize ' . ((&lines * 19 + 21) / 42)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
@@ -663,7 +538,6 @@ if file_readable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &so = s:so_save | let &siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :
