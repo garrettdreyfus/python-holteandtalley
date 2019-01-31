@@ -130,7 +130,10 @@ class densityProfile:
         thermoclineFit = np.polyfit(self.pressures[steepest-1:steepest+2],self.densities[steepest-1:steepest+2],1,full=True)[0]
         self.thermoclinefitline = thermoclineFit
         depth = abs(float(thermoclineFit[1] - mltBestFit[1])/float(thermoclineFit[0] - mltBestFit[0]))
-        self.MLTFITPressure = depth
+        if False:
+            self.MLTFITPressure = depth
+        else:
+            self.MLTFITPressure = self.pressures[self.findNearestPressureIndex(depth)]
         return self.findNearestPressureIndex(depth)
 
     # TESTD from matlab file

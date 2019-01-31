@@ -1,4 +1,5 @@
 import pickle
+import numpy as np
 matlabOutput={}
 pythonOutput={}
 
@@ -39,9 +40,9 @@ for i in pythonOutput:
     deltas["tempMLTFITD"].append(
         round(i["tempMLTFIT"] - matout["tempMLTFIT"],1)
     )
-    deltas["tempMLTFITIndex"].append(
-        i["tempMLTFITIndex"] - matout["tempMLTFITIndex"]
-    )
+    #deltas["tempMLTFITIndex"].append(
+        #i["tempMLTFITIndex"] - matout["tempMLTFITIndex"]
+    #)
     deltas["steepest"].append(
         i["steepest"] - matout["steepest"]
     )
@@ -56,8 +57,13 @@ for i in pythonOutput:
     deltas["densityAlgoD"].append(dd)
     deltas["debug"].append(i["debug"])
     #deltas["id"].append((int(i["platformNumber"]),i["cycleNumber"]))
-    if abs(round(i["salinityMLTFIT"] - matout["salinityMLTFIT"],1)) > 10:
-        higherror.append(((int(i["platformNumber"]),i["cycleNumber"]),i["salinityMLTFIT"],matout["salinityMLTFIT"],i["debug"]))
-
+    if abs(round(i["salinityAlgo"] - matout["salinityAlgo"],1)) > 30:
+        higherror.append(((int(i["platformNumber"]),i["cycleNumber"]),i["salinityAlgo"],matout["salinityAlgo"],i["debug"]))
 print(deltas)
 print(higherror)
+print("mean sal d",sum(np.abs(deltas["salinityAlgoD"]))/len(deltas["salinityAlgoD"]))
+print("max sal d",max(np.abs(deltas["salinityAlgoD"])))
+print("mean density d",sum(np.abs(deltas["densityAlgoD"]))/len(deltas["densityAlgoD"]))
+print("max density d",max(np.abs(deltas["densityAlgoD"])))
+print("mean temp d",sum(np.abs(deltas["temperatureAlgoD"]))/len(deltas["temperatureAlgoD"]))
+print("max temp d",max(np.abs(deltas["temperatureAlgoD"])))

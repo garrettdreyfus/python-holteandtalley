@@ -103,7 +103,10 @@ class tempProfile:
         thermoclineFit = np.polyfit(self.pressures[steepest-1:steepest+2],self.temperatures[steepest-1:steepest+2],1,full=True)[0]
         self.thermoclinefitline = thermoclineFit
         depth = abs(float(thermoclineFit[1] - mltBestFit[1])/float(thermoclineFit[0] - mltBestFit[0]))
-        self.MLTFITPressure = depth
+        if False:
+            self.MLTFITPressure = depth
+        else:
+            self.MLTFITPressure = self.pressures[self.findNearestPressureIndex(depth)]
         return self.findNearestPressureIndex(depth)
 
         # The temperature difference across the mltfit or T(i mltfit) - T(i mltfit + 2 )
@@ -209,8 +212,10 @@ class tempProfile:
 
     def findMLD(self):
         if self.dT > 0.5 or self.dT < -0.25:
+            self.season = 0
             self.foundMLD = self.mldSummerProfile()
         else:
+            self.season = 1
             self.foundMLD =  self.mldWinterProfile()
         return self.foundMLD
     def __str__(self):

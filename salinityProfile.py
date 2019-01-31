@@ -12,13 +12,12 @@ class salinityProfile:
         ##fnd reference pressure, this is done in holte and talley 
         ##supplementary matlab file
         startindex = np.argmin((np.asarray(pressures)-10)**2)
-        self.salinities = salinities[startindex:]
+        self.salinities = np.round_(salinities[startindex:],4)
         self.pressures = pressures[startindex:]
         self.densities = densities[startindex:]
-        self.salinityGradients = self.generateGradientList(self.salinities)
         self.densityGradients = self.generateGradientList(self.densities)
-        self.SMin = int(self.calculateSMin())
-        self.SMinPressure = pressures[self.SMin]
+        self.salinityGradients = np.round_(self.generateGradientList(self.salinities),5)
+        self.steepest = np.argwhere(np.abs(self.salinityGradients) == np.max(np.abs(self.salinityGradients)))[-1][0]+1
         self.MLTFIT, self.MLTFITPressure = self.calculateMLTFIT(self.salinities,self.salinityGradients)
         self.MLTFITDensity, self.MLTFITDensityPressure = self.calculateMLTFIT(self.densities,self.densityGradients)
         self.DThreshold = int(self.calculateDThreshold())
@@ -49,15 +48,6 @@ class salinityProfile:
         for i in range(1,len(tGS)-1):
             smoothed[i-1] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
         return smoothed
-
-    #The salinity minimum
-    #Closest paper equivalent TMAX
-    def calculateSMin(self):
-        maxIndex = 0
-        for i in range(len(self.salinities)):
-            if self.salinities[i] >= self.salinities[maxIndex]:
-                maxIndex = i
-        return maxIndex
 
     #calculates the TTMLD or the salinity threshold mixed layer estimate
     # based on a salinity threshold of 0.03 from Boyer Montegut
@@ -100,27 +90,33 @@ class salinityProfile:
                 errors.append(0)
         errorsum = np.sum(errors)
         #find line with normalized error less than 10^-10
+        self.errors= errors
         mltBestFit=None
+        mltBestFit = np.max(np.argwhere((errors/errorsum)> 10**-10))
         for index in range(len(errors)):
             if errors[index]/errorsum >(10**-10):
                 mltBestFit = fits[index-1]
                 break
         self.mltfitline=mltBestFit
+        self.mltfitindex = index-1
         #find thermoclineFit
-        steepest = np.argmax(np.abs(self.salinityGradients))+1
+        steepest = np.argwhere(np.abs(gradients) == np.max(np.abs(gradients)))[-1][0] +1
         #thermoclineFit = [gradients[steepest],
             #values[steepest]-gradients[steepest]*self.pressures[steepest]
         #]
-        thermoclineFit = np.polyfit(self.pressures[steepest-1:steepest+2],self.salinities[steepest-1:steepest+2],1,full=True)[0]
+        thermoclineFit = np.polyfit(self.pressures[steepest-1:steepest+2],values[steepest-1:steepest+2],1,full=True)[0]
         depth = abs(float(thermoclineFit[1] - mltBestFit[1])/float(thermoclineFit[0] - mltBestFit[0]))
-        return self.findNearestPressureIndex(depth),self.pressures[self.findNearestPressureIndex(depth)]# depth
+        if False:
+            return self.findNearestPressureIndex(depth), depth
+        else:
+            return self.findNearestPressureIndex(depth),self.pressures[self.findNearestPressureIndex(depth)]# depth
 
     # TESTD from matlab file
     def calculateDensityTest(self):
         if self.MLTFITDensity > 0 and self.MLTFITDensity < len(self.pressures)-2:
             ddiff = self.densities[self.MLTFIT]-self.densities[self.MLTFIT+2]
         else:
-            densityGradientMax = np.argmax(self.densityGradients)
+            densityGradientMax = np.argmax(np.abs(self.densityGradients))+1
             ddiff = self.densities[densityGradientMax-1] - self.densities[densityGradientMax+1]
         #various constants from paper
         if ddiff > -0.06 and self.dT > 0.5:
@@ -135,19 +131,20 @@ class salinityProfile:
     #The salinity gradient threshold or max if threshold not met
     # Matlab: dsmin (confusingly named I know)
     def calculateSGradientMax(self):
-        return np.argmax(self.salinityGradients)+1
+        return self.steepest
 
     #The minimum of the depth of the salinity gradiet maximum and the salinity minimum
     #In matlab file: dsandsmin
     def calculateIntrusionDepth(self):
-        steepest=0
-        for i in range(len(self.salinityGradients)):
-            if  (self.salinityGradients[i]) > self.salinityGradients[steepest]:
-                steepest=i
-        if self.pressures[steepest] < self.pressures[self.SMin]:
-            return steepest
+        x = np.argwhere(self.salinityGradients == np.min(self.salinityGradients))[-1][0]+1
+        y =  np.argwhere(self.salinities == np.min(self.salinities))[-1][0]
+        if abs(self.pressures[y] - self.pressures[x] ) < 100:
+            if y < x:
+                return y
+            else:
+                return x
         else:
-            return self.SMin
+            return 0
 
     #Based on find_mld.m from Holte and Talley Suplementary materials
     def mldWinterProfile(self):
@@ -213,7 +210,6 @@ class salinityProfile:
 
     def importantDepths(self):
         return [
-            [self.SMin,"Salinity Minimum"],
             [self.MLTFIT,"MLTFIT"],
             [self.DThreshold,"Density Threshold"],
             [self.SGradientMax,"Salinity Gradient Maximum"],
@@ -222,7 +218,6 @@ class salinityProfile:
 
     def __str__(self):
         out = ""
-        out += "SMinPressure: " + str(self.SMinPressure) + "\n"
         out += "MLTFITPressure: " + str(self.MLTFITPressure) + "\n"
         out += "DThresholdPressure: " + str(self.DThresholdPressure) + "\n"
         out += "SGradientMaxPressure: " + str(self.SGradientMaxPressure) + "\n"
