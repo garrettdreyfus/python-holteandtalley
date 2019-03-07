@@ -1,7 +1,6 @@
-import numpy as np
 import math
-from tempProfile import tempProfile
-from profile import *
+from .tempProfile import tempProfile
+from .profile import *
 class salinityProfile(Profile):
     def __init__(self,pressures,temperatures,salinities,densities,tp=None):
         self.mltfitline = []
@@ -14,6 +13,7 @@ class salinityProfile(Profile):
         ##fnd reference pressure, this is done in holte and talley 
         ##supplementary matlab file
         startindex = np.argmin((np.asarray(pressures)-10)**2)
+        print(salinities,startindex)
         self.salinities = np.round_(salinities[startindex:],4)
         self.pressures = pressures[startindex:]
         self.densities = densities[startindex:]

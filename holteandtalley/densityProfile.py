@@ -1,7 +1,8 @@
 import math
-from profile import *
-from tempProfile import tempProfile
-from salinityProfile import tempProfile
+import numpy as np
+from .profile import *
+from .tempProfile import tempProfile
+from .salinityProfile import salinityProfile
 class densityProfile(Profile):
     def __init__(self,pressures,temperatures,salinities,densities,tp=None,sp=None):
         self.mltfitline = []
@@ -11,7 +12,7 @@ class densityProfile(Profile):
         else:
             self.tp = tp
         if sp == None:
-            self.sp = tempProfile(pressures,temperatures)
+            self.sp = salinityProfile(pressures,temperatures,salinities,densities)
         else:
             self.sp = sp
         self.tp.findMLD()

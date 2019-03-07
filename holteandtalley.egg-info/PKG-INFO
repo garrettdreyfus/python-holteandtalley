@@ -1,0 +1,13 @@
+Metadata-Version: 1.1
+Name: holteandtalley
+Version: 0.0.1
+Summary: A python adaptation of the Holte and Talley mixed layer depth algorithm
+Home-page: https://github.com/garrettdreyfus/python-holteandtalley
+Author: Garrett Finucane
+Author-email: garrettdreyfus@gmail.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent

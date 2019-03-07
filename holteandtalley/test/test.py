@@ -1,6 +1,4 @@
-from tempProfile import tempProfile
-from densityProfile import densityProfile
-from salinityProfile import salinityProfile
+from holteandtalley import HolteAndTalley
 import numpy as np
 import gsw as gsw
 from netCDF4 import Dataset
@@ -45,6 +43,7 @@ for file in os.listdir("profiles"):
             tempsOut=[]
             pressuresOut=[]
             densitiesOut=[]
+            salinitiesOut=[]
             for index in range(len(pressures)):
                 if pressures[index] != "_":
                     pres = pressures[index]
@@ -54,22 +53,24 @@ for file in os.listdir("profiles"):
                     tempsOut.append(temp)
                     pressuresOut.append(float(pres))
                     densitiesOut.append(float(gsw.sigma0(psal,temp)))
+                    salinitiesOut.append(psal)
             #temps = tempsOut
             densities = densitiesOut
             pressuress = pressuresOut
             salinities = salts
             #b = densityProfile(densitiesOut,ps)
             line = {}
-            t = tempProfile(pressures,temps)
+            h = HolteAndTalley(pressures,temps,salinities,densities)
+            t = h.temp
             line["tempAlgo"] = t.findMLD()
             num = ""
             for i in dataset.variables["PLATFORM_NUMBER"][:][0]:
                 if len(str(i)) >= 4:
                     num+=str(i)[2]
             line["platformNumber"] = num 
-            s = salinityProfile(pressures,temps,salinities,densities)
+            s = h.salinity
             line["salinityAlgo"] = s.findMLD()
-            d = densityProfile(pressures,temps,salts,densities,sp=s)
+            d=h.density
             line["densityAlgo"] = d.findMLD()
             line["tempThreshold"] = t.TTMLDPressure
             line["tempGradient"] = t.DTMPressure
@@ -84,7 +85,7 @@ for file in os.listdir("profiles"):
             line["debug"] = d.debug
             line["steepest"] = s.SGradientMax
             out.append(line)
-            #if int(num) == 3900623 and cycleNumber == 3:
+            ##if int(num) == 3900623 and cycleNumber == 3:
                 #print("MLTFIT: ", s.MLTFITPressure)
                 ##print("MLTFITINDEX: ",s.mltfitindex)
                 #print("D Threshold: ",s.DThresholdPressure)

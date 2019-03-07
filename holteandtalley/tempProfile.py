@@ -1,5 +1,5 @@
-from profile import Profile
-from profile import np
+from .profile import Profile
+import numpy as np
 class tempProfile(Profile):
     def __init__(self,pressures,temperatures):
         self.mltfitline = []
