@@ -2,7 +2,7 @@
 
 This is a python port of the mixed layer depth algorithm outlined in [Holte and Talley 2009](http://mixedlayer.ucsd.edu/data/HolteTalley2009.pdf).
 
-##Installation
+## Installation
 To install from the pypi repository:
 
 `pip install holteandtalley`
@@ -13,7 +13,7 @@ If you would like to install it from source in order to make changes:
 pip install -e .
 ```
 this will allow you to `import holteandtalley` from anywhere on your machine, but any changes you make to the source will be immediately reflected.
-##Usage
+## Usage
 ```
 from holteandtalley import HolteAndTalley
 
