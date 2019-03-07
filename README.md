@@ -1,8 +1,38 @@
 # Holte and Talley Mixed Layer Depth algorithm
 
-The paper outlining this algorithm is [here](http://mixedlayer.ucsd.edu/data/HolteTalley2009.pdf)
+This is a python port of the mixed layer depth algorithm outlined in [Holte and Talley 2009](http://mixedlayer.ucsd.edu/data/HolteTalley2009.pdf).
 
+##Installation
+To install from the pypi repository:
 
+`pip install holteandtalley`
+
+If you would like to install it from source in order to make changes:
+```
+#run this in the cloned repository
+pip install -e .
+```
+this will allow you to `import holteandtalley` from anywhere on your machine, but any changes you make to the source will be immediately reflected.
+##Usage
+```
+from holteandtalley import HolteAndTalley
+
+ h = HolteAndTalley(pressures,temperaturess,salinities,densities)
+ ##The temperature algorithms mixed layer depth
+ h.tempMLD
+ ##The salinity algorithms mixed layer depth
+ h.salinityMLD
+ ##The density algorithms mixed layer depth
+ h.densityMLD
+```
+It is also possible to use only the temperature algorithm
+```
+from holteandtalley import HolteAndTalley
+
+ h = HolteAndTalley(pressures,temperatures)
+ ##The temperature algorithms mixed layer depth
+ h.tempMLD
+```
 ## The Temperature Algorithm
 ### Summer Flow Graph
 ![summer flow graph](readmeimages/summer.png)
