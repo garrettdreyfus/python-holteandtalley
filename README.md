@@ -1,6 +1,6 @@
 # Holte and Talley Mixed Layer Depth algorithm
 
-The paper outlining this algorithm is [here](http://http://mixedlayer.ucsd.edu/data/HolteTalley2009.pdf)
+The paper outlining this algorithm is [here](http://mixedlayer.ucsd.edu/data/HolteTalley2009.pdf)
 
 
 ## The Temperature Algorithm
