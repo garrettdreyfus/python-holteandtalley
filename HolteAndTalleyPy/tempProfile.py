@@ -1,5 +1,6 @@
-import numpy as np
-class tempProfile:
+from profile import Profile
+from profile import np
+class tempProfile(Profile):
     def __init__(self,pressures,temperatures):
         self.mltfitline = []
         self.thermoclinefitline = []
@@ -9,11 +10,10 @@ class tempProfile:
         startindex = np.argmin((np.asarray(pressures)-10.0)**2)
         self.temperatures = temperatures[startindex:]
         self.pressures = pressures[startindex:]
-        self.temperatureGradients= self.generateGradientList()
+        self.temperatureGradients= self.generateGradientList(self.temperatures)
         self.TMax = int(self.calculateTMax())
         self.TMaxPressure = self.pressures[self.TMax]
-        self.MLTFIT = int(self.calculateMLTFIT())
-        #self.MLTFITPressure = pressures[self.MLTFIT]
+        self.MLTFIT, self.MLTFITPressure = self.calculateMLTFIT(self.temperatures,self.temperatureGradients)
         self.TTMLD = int(self.calculateTTMLD())
         self.TTMLDPressure = self.interpolateTTMLD()
         self.dT = self.calculateDeltaT()
@@ -26,21 +26,6 @@ class tempProfile:
         #range from paper
         self.range = 25
         return
-
-    ##find nearest pressure
-    def findNearestPressureIndex(self,value):
-        return (np.abs(np.asarray(self.pressures)- value)).argmin()
-
-    def generateGradientList(self):
-        tGS=[]
-        for index in range(len(self.temperatures)-1):
-            dt = float(self.temperatures[index] - self.temperatures[index+1])
-            dp = float(self.pressures[index] - self.pressures[index+1])
-            tGS.append(dt/dp)
-        smoothed=[0]*(len(tGS)-2)
-        for i in range(1,len(tGS)-1):
-            smoothed[i-1] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
-        return smoothed
 
     #The temperature maximum
     def calculateTMax(self):
@@ -69,47 +54,7 @@ class tempProfile:
             return self.pressures[thresholdIndex-1] + (deltaP/deltaT)*((self.temperatures[0]+0.2)-self.temperatures[thresholdIndex-1])
         #return self.pressures[thresholdIndex]# + (deltaP/deltaT)*(0.03-abs(self.temperatures[thresholdIndex-1]))
 
-
-
-    # calculates the MLTFIT or the intersection of the best fit mixed layer line
-    # and the best fit of the thermocline
-    def calculateMLTFIT(self):
-        #Calculate the best fit line of the mixed layer
-        errors = []
-        fits = []
-        #iterate through and polyfit over progressively increasing points
-        for num in range(2,len(self.pressures)):
-            out = np.polyfit(self.pressures[0:num],self.temperatures[0:num],1,full=True)
-            fits.append(out[0])
-            if out[1]:
-                errors.append(out[1][0])
-            else:
-                errors.append(0)
-        errorsum = np.sum(errors)
-        #find line with normalized error less than 10^-10
-        mltBestFit=None
-        for index in range(len(errors)):
-            if errors[index]/errorsum >(10**-10):
-                self.mltfitindex=index-1
-                mltBestFit = fits[index-1]
-                break
-        self.mltfitline=mltBestFit
-        #find thermoclineFit
-        steepest = np.argmax(np.abs(self.temperatureGradients))+1
-        self.steepest = steepest
-        #thermoclineFit = [self.temperatureGradients[steepest],
-            #self.temperatures[steepest]-self.temperatureGradients[steepest]*self.pressures[steepest]
-        #]
-        thermoclineFit = np.polyfit(self.pressures[steepest-1:steepest+2],self.temperatures[steepest-1:steepest+2],1,full=True)[0]
-        self.thermoclinefitline = thermoclineFit
-        depth = abs(float(thermoclineFit[1] - mltBestFit[1])/float(thermoclineFit[0] - mltBestFit[0]))
-        if False:
-            self.MLTFITPressure = depth
-        else:
-            self.MLTFITPressure = self.pressures[self.findNearestPressureIndex(depth)]
-        return self.findNearestPressureIndex(depth)
-
-        # The temperature difference across the mltfit or T(i mltfit) - T(i mltfit + 2 )
+    # The temperature difference across the mltfit or T(i mltfit) - T(i mltfit + 2 )
     def calculateDeltaT(self):
         if self.MLTFIT < len(self.temperatures)-2:
             return float(self.temperatures[self.MLTFIT] - self.temperatures[self.MLTFIT+2])

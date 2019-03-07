@@ -78,11 +78,11 @@ for file in os.listdir("profiles"):
             line["cycleNumber"] = cycleNumber
             line["tempMLTFIT"] = t.MLTFITPressure
             line["tempMLTFITIndex"] = t.mltfitindex
-            line["densityMLTFIT"] = d.MLTFITPressure
-            line["salinityMLTFIT"] = s.MLTFITPressure
+            line["densityMLTFIT"] = d.MLTFITDensityPressure
+            line["salinityMLTFIT"] = s.MLTFITSalinityPressure
             line["salinityMLTFITIndex"] = s.mltfitindex
             line["debug"] = d.debug
-            line["steepest"] = s.steepest
+            line["steepest"] = s.SGradientMax
             out.append(line)
             #if int(num) == 3900623 and cycleNumber == 3:
                 #print("MLTFIT: ", s.MLTFITPressure)
