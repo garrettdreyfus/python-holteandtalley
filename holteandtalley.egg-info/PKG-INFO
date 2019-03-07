@@ -5,7 +5,7 @@ Summary: A python adaptation of the Holte and Talley mixed layer depth algorithm
 Home-page: https://github.com/garrettdreyfus/python-holteandtalley
 Author: Garrett Finucane
 Author-email: garrettdreyfus@gmail.com
-License: UNKNOWN
+License: MIT
 Description: UNKNOWN
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3

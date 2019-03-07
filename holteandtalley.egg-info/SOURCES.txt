@@ -1,5 +1,8 @@
 README.md
+setup.py
+holteandtalley/__init__.py
 holteandtalley/densityProfile.py
+holteandtalley/handt.py
 holteandtalley/profile.py
 holteandtalley/salinityProfile.py
 holteandtalley/tempProfile.py
