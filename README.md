@@ -33,6 +33,19 @@ from holteandtalley import HolteAndTalley
  ##The temperature algorithms mixed layer depth
  h.tempMLD
 ```
+## Metrics
+
+While I tried to make this as close to the Matlab code provided in the supplementary materials of the paper I was unable to make it exactly the same. Below is a table which shows the max,mean, and standard deviation of difference between the output of the matlab library and this one after being run on the 138 profiles provided in the supplementary materials of the original paper.
+
+| Algorithm    | Max Difference | Mean Difference  | Standard Deviation Difference|
+| -------------|:-------------: | -----:           |--------------------| 
+| Temperature  | 0.5 dbar       |  0.06 dbar       |  0.13 dbar         |
+| Density      | 12  dbar       |  0.275 dbar      |  1.447 dbar        |
+| Salinity     | 8.0 dbar       |  0.12 dbar       |  0.8  dbar         |
+
+NOTE: The version of the matlab library I used I slightly modified to correct for some quirks of the library which I think are bugs.
+
+
 ## The Temperature Algorithm
 ### Summer Flow Graph
 ![summer flow graph](readmeimages/summer.png)
