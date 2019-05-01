@@ -10,7 +10,7 @@ class tempProfile(Profile):
         startindex = np.argmin((np.asarray(pressures)-10.0)**2)
         self.temperatures = temperatures[startindex:]
         self.pressures = pressures[startindex:]
-        self.temperatureGradients= self.generateGradientList(self.temperatures)
+        self.temperatureGradients= self.generateGradientListNoSmooth(self.temperatures)
         self.TMax = int(self.calculateTMax())
         self.TMaxPressure = self.pressures[self.TMax]
         self.MLTFIT, self.MLTFITPressure = self.calculateMLTFIT(self.temperatures,self.temperatureGradients)

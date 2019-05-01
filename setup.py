@@ -1,7 +1,7 @@
 import setuptools
 setuptools.setup(
     name="holteandtalley",
-    version="0.0.1",
+    version="0.0.2",
     author="Garrett Finucane",
     author_email="garrettdreyfus@gmail.com",
     description="A python adaptation of the Holte and Talley mixed layer depth algorithm",

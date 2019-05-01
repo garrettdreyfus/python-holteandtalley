@@ -14,6 +14,14 @@ class Profile():
         for i in range(1,len(tGS)-1):
             smoothed[i-1] = (tGS[i-1]+tGS[i]+tGS[i+1])/3.0
         return smoothed
+            
+    def generateGradientListNoSmooth(self,values):
+        tGS=[]
+        for index in range(len(values)-1):
+            dt = float(values[index] - values[index+1])
+            dp = float(self.pressures[index] - self.pressures[index+1])
+            tGS.append(dt/dp)
+        return tGS[1:-1]
 
     def calculateMLTFIT(self,values,gradients):
         #Calculate the best fit line of the mixed layer
@@ -42,7 +50,10 @@ class Profile():
         steepest = np.argwhere(np.abs(gradients) == np.max(np.abs(gradients)))[-1][0] +1
 
         thermoclineFit = np.polyfit(self.pressures[steepest-1:steepest+2],values[steepest-1:steepest+2],1,full=True)[0]
-        depth = abs(float(thermoclineFit[1] - mltBestFit[1])/float(thermoclineFit[0] - mltBestFit[0]))
+        if thermoclineFit[0] != mltBestFit[0]:
+            depth = abs(float(thermoclineFit[1] - mltBestFit[1])/float(thermoclineFit[0] - mltBestFit[0]))
+        else:
+            depth = self.pressures[steepest]
 
         ## a switch to choose whether to use nearest pressure or not
         if False:
